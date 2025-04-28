@@ -1,3 +1,4 @@
 # CS-300-Project-1
 CS 300 Project 1
 For Project One of CS 300, my focus is to understand and use different data structures in pseudocode for that will help to sort information about Computer Science courses for ABCU. My three data structures that were used here are vector, hash table and binary tree, after creating pseudocodes for each of these, I then ran an analysis using Big O in order to determine which data structure is more efficient and gave my pros and cons. In the end I then gave my opinion which data structure I'd prefer to use over the other two. 
+For Project Two, I then have to implement what I have learned about the data structure, I decided to use the hash table data structure and attach a file to it with course information. If the coding is done correctly then the code I used should sort each course into alphanumeric order. 
