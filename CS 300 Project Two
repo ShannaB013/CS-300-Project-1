@@ -1,0 +1,210 @@
+//=======================================================
+//Name: CS 300 Project 2
+//Author: Shanna Boyte
+//Version: 1.0
+//=======================================================
+
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <algorithm>
+#include <cctype>
+
+using namespace std;
+
+struct Course { //structure to hold course data
+	string courseNumber;
+	string courseTitle;
+	vector<string> coursePreq;
+
+};
+
+struct Node { //node for linked list
+	Course course;
+	Node* next;
+	Node(Course c) : course(c), next(nullptr) {}
+
+};
+
+class HashTable { //hash table class
+private:
+	static const int TABLE_SIZE = 100;
+	vector<Node*> table;
+
+	int hashfunction(const string& key) { //hash function
+		int hash = 0;
+		for (char ch : key) {
+			hash = hash * 31 + ch) % TABLE_SIZE;
+
+		}
+		return hash;
+	}
+
+public:
+	HashTable() {
+		table.resize(TABLE_SIZE, nullptr);
+	}
+	void insert(Course course) { //inserts course into hash table
+		int index = hashFunction(course.courseNumber);
+		Node* newNode = new Node(course); 
+		newNode->next = table[index];
+		table[index] = newNode;
+	}
+
+	Course* search(const string& courseNumber) { //search by ID
+		ing index = hashFunction(courseNumber);
+		Node* current = table[index];
+		while (current) {
+			if (current->course.courseNumber == courseNumber) {
+				return &current->course;
+			}
+			current = current->next;
+		}
+		return nullptr;
+	}
+	vector<Course> getAllCourses() { //gets all courses for sorting and printing
+		vector<Course> allCourses;
+		for (Node* head : table) {
+			Node* current = head;
+			while (current) {
+				allCourses.push_back(current->course);
+				current = current->next;
+			}
+		}
+		return allCourses;
+	}
+};
+
+vector<string> split(const string& str, char delimiter) { //splits a string
+	vector<string> tokens;
+	string token;
+	istringstream stream(str);
+	while (getline(stream, token, delimiter)) {
+		tokens.push_back(token);
+	}
+	return tokens;
+}
+
+HashTable courseTable; //hash table instance
+
+void loadCourses(const string& filename) {
+	ifstream file(CS 300 ABCU_Advising_Program_Input.csv);
+	if (!file.is_open()) {
+		cout << "Error: Unable to open file. \n";
+		return;
+	}
+
+	string line;
+	while (getline(file, line)) {
+		vector<string> tokens = split(line, ',');
+		if (tokens.size() < 2) {
+			cout << "Invalid line: " << line << endl;
+			continue;
+
+		}
+
+		Course course;
+		course.courseNumber = tokens[0];
+		course.courseTitle = tokens[1];
+
+		for (size_t i = 2; i < tokens.size(); ++i) {
+			course.coursePreq.push_back(tokens[i]);
+
+		}
+		courseTable.insert(course);
+	}
+	file.close();
+	cout << "Courses loaded successfully. \n";
+}
+
+void printCourseList() { //prints courses in alphanumeric order
+	vector<Course> courses = courseTable.getAllCourses();
+	sort(courses.begin(), courses.end(), [](const Course& a, const Course& b) {
+		return a.courseNumber < b.courseNumber;
+		});
+
+		for (const Course& course : courses) {
+			cout << course.courseNumber << ": " << course.courseTitle << endl;
+		}
+}
+
+void printCourseInfo(const string& courseNumberInput) { //prints specific course info
+	string courseNumber = courseNumberInput;
+
+	transform(courseNumber.begin(), courseNumber.end(), courseNumber.begin(), ::toupper);
+
+	Course* course - courseTable.search(courseNumber);
+	if (!course) {
+		cout << "Course not found. \n";
+		return;
+	}
+
+	cout << course->courseNumber << ": " << course->courseTitle<< endl;
+
+	if (course->coursePreq.empty()) {
+		cout << "Prerequisites: None\n";
+	}
+	else {
+		cout << "Prerequisites: ";
+		for (size_t i = 0; i < course->coursePreq.size(); ++i) {
+			cout << course->coursePreq[i];
+			if (i < course->coursePreq.size() - 1) {
+				cout << ", ";
+			}
+		}
+		cout << endl;
+	}
+}
+
+void displayMenu() { //display main menu and reads user inputs
+	int choice;
+	string filename, courseNumber;
+
+	cout << "Welcome to the course planner." << endl;
+
+	do {
+		cout << "\n1. Load Data Structure. \n"
+			<< "2. Print Course List. \n"
+			<< "3. Print Course. \n"
+			<< "9. Exit" << endl; 
+
+		cout << "What would you like to do? ";
+		cin >> choice;
+
+		switch (choice) {
+		case 1:
+			cout << "Enter filename: ";
+			cin >> filename;
+			loadCourses(filename);
+			break;
+
+		case 2:
+			cout << "Here is a sample schedule:" << endl;
+			printCourseList();
+			break;
+
+		case 3:
+			cout << "What course do you want to know about?";
+			cin >> courseNumber;
+			printCourseInfo(courseNumber);
+			break;
+
+		case 9:
+			cout << "Thank you for using the course planner!" << endl;
+			break;
+
+		default:
+			cout << choice << " is not a valid option." << endl;
+			break;
+
+		}
+		
+	} while (choice != 9);
+}
+
+int main() { //main
+	displayMenu();
+	return 0;
+
+}
